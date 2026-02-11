@@ -2,7 +2,6 @@
 
 # dependencies
 *.log
-*.json
 *.env
 /node_modules
 /.pnp
