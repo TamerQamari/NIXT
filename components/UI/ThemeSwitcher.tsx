@@ -10,14 +10,14 @@ interface ThemeSwitcherProps {
 const ThemeSwitcher: FC<ThemeSwitcherProps> = ({ onThemeChange }) => {
   return (
     <div className={styles.themeSw}>
-      <button 
+      {/* <button 
         className={styles.thBtn} 
         onClick={onThemeChange} 
         title="Change Theme" 
         aria-label="Change Theme"
       >
         🧿
-      </button>
+      </button> */}
     </div>
   )
 }
