@@ -1,0 +1,190 @@
+@import "tailwindcss";
+
+:root {
+  --bg-color: #000000;
+  --accent-blue: #0055ff;
+  --accent-cyan: #27d9f5;
+  --text-white: #ffffff;
+  --text-dim: rgba(255, 255, 255, 0.6);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #000;
+  background-image: 
+    radial-gradient(circle at bottom center, #001a4d 0%, transparent 85%),
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 100%, 50px 50px, 50px 50px;
+  background-attachment: fixed;
+  color: var(--text-white);
+  font-family: 'Poppins', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::selection {
+  background: var(--accent-cyan);
+  color: #000;
+}
+
+/* Footer Styles */
+.site-footer {
+  padding: 60px 8%;
+  text-align: center;
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 1px;
+}
+
+/* Vercel-like Styles */
+.vercel-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 24px;
+  height: 48px;
+  border-radius: 99px;
+  font-weight: 500;
+  font-size: 15px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: inherit;
+  border: 1px solid transparent;
+}
+
+.vercel-btn-primary {
+  background: white;
+  color: black;
+  border: 1px solid white;
+}
+.vercel-btn-primary:hover {
+  background: transparent;
+  color: white;
+}
+
+.vercel-btn-secondary {
+  background: rgba(255,255,255,0.08);
+  color: white;
+  border: 1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+}
+.vercel-btn-secondary:hover {
+  background: rgba(255,255,255,0.15);
+  border-color: white;
+}
+
+@keyframes logoFade {
+  from { 
+    opacity: 0; 
+    letter-spacing: 10px; 
+  }
+  to { 
+    opacity: 1; 
+    letter-spacing: -2px; 
+  }
+}
+
+@keyframes scroll {
+  0% { 
+    transform: translateX(0); 
+  }
+  100% { 
+    transform: translateX(-50%); 
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  body {
+    background-size: 100% 100%, 40px 40px, 40px 40px;
+  }
+
+  .vercel-btn {
+    padding: 0 20px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .site-footer {
+    padding: 50px 5%;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+    background-size: 100% 100%, 30px 30px, 30px 30px;
+  }
+
+  .vercel-btn {
+    padding: 0 20px;
+    height: 42px;
+    font-size: 14px;
+    width: 100%;
+    max-width: none;
+  }
+
+  .vercel-btn-primary,
+  .vercel-btn-secondary {
+    touch-action: manipulation;
+  }
+
+  .site-footer {
+    padding: 40px 5%;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 13px;
+    background-size: 100% 100%, 25px 25px, 25px 25px;
+  }
+
+  .site-footer {
+    padding: 30px 20px;
+    font-size: 9px;
+    letter-spacing: 0.5px;
+  }
+
+  .vercel-btn {
+    padding: 0 18px;
+    height: 40px;
+    font-size: 13px;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  a, button {
+    touch-action: manipulation;
+  }
+}
+
+.site-footer {
+  padding: 25px 15px;
+  font-size: 8px;
+}
+
+@media (max-width: 360px) {
+  body {
+    font-size: 12px;
+  }
+
+  .vercel-btn {
+    padding: 0 16px;
+    height: 38px;
+    font-size: 12px;
+  }
+}

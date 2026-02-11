@@ -1,0 +1,135 @@
+.container {
+  margin-top: 100px;
+  text-align: center;
+}
+
+.title {
+  color: #666;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+  font-family: inherit;
+  font-weight: 500;
+}
+
+.logoTicker {
+  background: transparent;
+  overflow: hidden;
+  position: relative;
+  mask: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  -webkit-mask: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.tickerWrapper {
+  display: flex;
+  width: fit-content;
+  height: 50px;
+  animation: scroll 20s linear infinite;
+  will-change: transform;
+}
+
+.tickerItem {
+  padding: 0 60px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  transition: all 0.4s ease;
+}
+
+.tickerItem img,
+.tickerItem > span {
+  height: 35px !important;
+  width: auto !important;
+  max-width: 120px;
+  filter: grayscale(100%) brightness(200%);
+  opacity: 0.5;
+  transition: all 0.4s ease;
+}
+
+.tickerItem:hover img,
+.tickerItem:hover > span {
+  filter: grayscale(0%) brightness(100%);
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .container {
+    margin-top: 60px;
+  }
+
+  .title {
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    margin-bottom: 20px;
+  }
+
+  .tickerWrapper {
+    height: 40px;
+    animation: scroll 25s linear infinite;
+  }
+
+  .tickerItem {
+    padding: 0 40px;
+  }
+
+  .tickerItem img,
+  .tickerItem > span {
+    height: 28px !important;
+    max-width: 100px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    margin-top: 40px;
+  }
+
+  .title {
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .tickerWrapper {
+    height: 35px;
+    animation: scroll 30s linear infinite;
+  }
+
+  .tickerItem {
+    padding: 0 30px;
+  }
+
+  .tickerItem img,
+  .tickerItem > span {
+    height: 24px !important;
+    max-width: 80px;
+  }
+
+  .tickerItem:hover img,
+  .tickerItem:hover > span {
+    transform: scale(1.05);
+  }
+}

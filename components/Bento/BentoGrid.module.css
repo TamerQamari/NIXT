@@ -1,0 +1,813 @@
+.bentoSection {
+  padding: 150px 8%;
+  background: transparent;
+  position: relative;
+}
+
+/* Add a global dot pattern to the section background (optional) or just use for cards */
+.dotBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(#333 1px, transparent 1px);
+  background-size: 20px 20px;
+  mask-image: radial-gradient(circle at 50% 50%, black, transparent);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, black, transparent);
+  opacity: 0.2;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.gridContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: minmax(320px, auto);
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.card {
+  /* Default dark background */
+  background: rgba(10, 10, 10, 0.6); 
+  /* Border is now handled by the ::before element for the spotlight effect, or kept simple */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* DOT PATTERN OVERLAY FOR CARDS */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.2) 1px, transparent 1px);
+  background-size: 16px 16px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Reveal dots on hover over the card area - localized effect */
+.card:hover::before {
+  opacity: 0.3;
+}
+
+/* Spotlight Gradient Overlay */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 12px;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 0) var(--mouse-y, 0), 
+    rgba(255, 255, 255, 0.15),
+    transparent 40%
+  );
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+/* When hovering the grid container, we turn on the spotlight capability */
+.gridContainer:hover .card::after {
+  opacity: 1;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  /* Remove direct border brightness change, rely on spotlight */
+  box-shadow: 0 10px 40px -10px rgba(0,0,0,0.5);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Span Utilities */
+.span2 {
+  grid-column: span 2;
+}
+
+.span3 {
+  grid-column: span 3;
+}
+
+.rowSpan2 {
+  grid-row: span 2;
+}
+
+/* Content Styling */
+.cardTitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  margin-bottom: 12px;
+  color: #fff;
+  letter-spacing: -0.5px;
+}
+
+.headerTitle {
+  font-size: 42px;
+  background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -2px;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  font-weight: 600;
+}
+
+.cardDesc {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-weight: 300;
+}
+
+.arrowIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  font-size: 10px;
+  color: #666;
+}
+
+/* Visual Areas Styles to match Vercel look */
+.cardVisual {
+  flex: 1;
+  width: 100%;
+  margin-top: auto;
+  position: relative;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Specific Visual Styles */
+.thinkingInput {
+  width: 100%;
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  color: #666;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tagsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+}
+
+.tag {
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 6px;
+  padding: 8px;
+  font-size: 11px;
+  color: #888;
+  text-align: center;
+}
+
+.browserWindow {
+  width: 100%;
+  background: #000;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 15px;
+  position: relative;
+}
+
+/* Digital Card Style - 3D Dot Matrix Version */
+.digitalCardWrapper {
+  perspective: 1000px;
+  width: 100%;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible;
+}
+
+.digitalCard {
+  width: 240px;
+  height: 150px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: floatCard 6s ease-in-out infinite;
+}
+
+@keyframes floatCard {
+  0%, 100% { transform: rotateY(0deg) rotateX(0deg) translateY(0); }
+  50% { transform: rotateY(10deg) rotateX(5deg) translateY(-10px); }
+}
+
+.cardFace {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 12px;
+  /* Glassy dark background */
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(0, 85, 255, 0.103);
+  /* The Dot Pattern - Matching the cube */
+  /* background-image: radial-gradient(circle, rgba(0, 85, 255, 0.8) 1.5px, transparent 1.5px); */
+  background-size: 20px 20px;
+  
+  box-shadow: 
+    0 0 15px rgba(0, 85, 255, 0.1),
+    inset 0 0 20px rgba(0, 85, 255, 0.05);
+
+  backface-visibility: visible;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.cardFace.back {
+  transform: rotateY(180deg);
+  background: rgba(0, 10, 20, 0.9);
+}
+
+.cardChip {
+  width: 40px;
+  height: 30px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  background: rgba(255, 215, 0, 0.1);
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cardChip::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(90deg, transparent 50%, rgba(255, 215, 0, 0.2) 50%),
+    linear-gradient(0deg, transparent 50%, rgba(255, 215, 0, 0.2) 50%);
+  background-size: 10px 10px;
+}
+
+.cardLogo {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 18px;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255,255,255,0.5);
+  letter-spacing: 1px;
+}
+
+.cardDots {
+  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+  text-shadow: 0 0 5px rgba(0, 85, 255, 0.5);
+}
+
+.cardName {
+  font-size: 10px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+  margin-top: 10px;
+  letter-spacing: 2px;
+}
+
+/* Glowing orb behind the card for atmosphere */
+.digitalCardWrapper::before {
+  content: '';
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background: radial-gradient(circle, rgba(0, 85, 255, 0.3) 0%, transparent 70%);
+  filter: blur(20px);
+  z-index: 0;
+  animation: pulseGlow 4s infinite alternate;
+}
+
+@keyframes pulseGlow {
+  0% { transform: scale(1); opacity: 0.5; }
+  100% { transform: scale(1.5); opacity: 0.8; }
+}
+
+
+.windowControls {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.control {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.browserWindow {
+  width: 80%;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 16px;
+  transition: transform 0.3s ease;
+}
+
+.card:hover .browserWindow {
+  transform: translateY(-5px);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.stackedWindows {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end; /* Align bottom */
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+.stackItem {
+  background: #000;
+  border: 1px solid #161616;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #666;
+  position: absolute;
+  transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 0 -10px 20px rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+}
+
+.stackLeft {
+  margin-right: auto;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+.stackCenter {
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transform: translateX(-10px); /* Adjust for left icons */
+}
+
+.stackControls {
+  display: flex;
+  gap: 6px;
+  margin-right: auto;
+}
+.stackControls span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+/* Stacked Positions */
+.stackItem:nth-child(1) { bottom: 95px; width: 60%; opacity: 0.2; z-index: 1; transform: scale(0.85); }
+.stackItem:nth-child(2) { bottom: 70px; width: 70%; opacity: 0.4; z-index: 2; transform: scale(0.90);}
+.stackItem:nth-child(3) { bottom: 45px; width: 80%; opacity: 0.7; z-index: 3; transform: scale(0.95);}
+.stackItem:nth-child(4) { 
+  bottom: -4px; 
+  width: 90%; 
+  opacity: 1; 
+  z-index: 4; 
+  transform: scale(1); 
+  background: #050505;
+  height: 50px;
+}
+
+/* Hover Effect: Fan out slightly */
+.card:hover .stackItem:nth-child(1) { bottom: 120px; opacity: 0.3; }
+.card:hover .stackItem:nth-child(2) { bottom: 90px; opacity: 0.5; }
+.card:hover .stackItem:nth-child(3) { bottom: 60px; opacity: 0.8; }
+.card:hover .stackItem:nth-child(4) { bottom: 20px; }
+
+/* Composable Commerce Interaction */
+.commerceContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  perspective: 600px;
+}
+
+.commerceItem {
+  width: 70px;
+  height: 95px;
+  background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+  border: 1px solid #333;
+  border-radius: 8px;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+}
+
+/* Skeleton content inside items */
+.commerceItem::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  height: 35px;
+  background: #2a2a2a;
+  border-radius: 4px;
+}
+
+.commerceItem::before {
+  content: '';
+  position: absolute;
+  bottom: 12px;
+  left: 10px;
+  width: 40%;
+  height: 6px;
+  background: #333;
+  border-radius: 3px;
+}
+
+/* Middle Item default state */
+.commerceItem:nth-child(2) {
+  transform: scale(1.1);
+  z-index: 2;
+  border-color: #555;
+  background: linear-gradient(180deg, #222, #111);
+}
+
+.commerceItem:nth-child(2)::after {
+  background: #333;
+}
+
+/* Hover Effects on Parent Card */
+.card:hover .commerceItem:nth-child(1) {
+  transform: translateX(-15px) rotateY(20deg) scale(0.95);
+  border-color: #444;
+  opacity: 0.6;
+}
+
+.card:hover .commerceItem:nth-child(2) {
+  transform: scale(1.2) translateZ(30px);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 20px rgba(39, 217, 245, 0.2);
+  z-index: 10;
+}
+
+.card:hover .commerceItem:nth-child(3) {
+  transform: translateX(15px) rotateY(-20deg) scale(0.95);
+  border-color: #444;
+  opacity: 0.6;
+}
+
+/* Add a scanner line for the middle item on hover */
+.commerceItem:nth-child(2) .scanLine {
+  display: none; /* If JS inserted, but we'll stick to CSS only for now using pseudo if needed, but the glow is enough */
+}
+
+
+
+/* Bottom Infrastructure */
+.infraVisual {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-left: 40px;
+}
+
+.connector {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.infraLogo {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.infraLogoTriangle {
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 14px solid black;
+}
+
+.infraLines {
+  position: absolute;
+  right: -50px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.line {
+  width: 50px;
+  height: 1px;
+}
+
+.infraIcons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.infraIcon {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #000;
+}
+
+@media (max-width: 1024px) {
+  .gridContainer {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+
+  .bentoSection {
+    padding: 100px 5%;
+  }
+
+  .card {
+    padding: 24px;
+  }
+
+  .headerTitle {
+    font-size: 36px;
+  }
+
+  .cardTitle {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .gridContainer {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    grid-auto-rows: minmax(280px, auto);
+  }
+
+  .bentoSection {
+    padding: 80px 5%;
+  }
+
+  .card {
+    min-height: auto;
+    padding: 24px;
+  }
+
+  .headerTitle {
+    font-size: 32px;
+    letter-spacing: -1px;
+  }
+
+  .cardTitle {
+    font-size: 20px;
+  }
+
+  .cardDesc {
+    font-size: 13px;
+  }
+
+  /* إلغاء الـ span للكروت على الموبايل */
+  .span2,
+  .span3 {
+    grid-column: span 1;
+  }
+
+  .rowSpan2 {
+    grid-row: span 1;
+  }
+
+  /* تقليل حجم العناصر البصرية */
+  .cube {
+    width: 120px;
+    height: 120px;
+  }
+
+  .face {
+    width: 120px;
+    height: 120px;
+  }
+
+  .front  { transform: rotateY(0deg) translateZ(60px); }
+  .back   { transform: rotateY(180deg) translateZ(60px); }
+  .right  { transform: rotateY(90deg) translateZ(60px); }
+  .left   { transform: rotateY(-90deg) translateZ(60px); }
+  .top    { transform: rotateX(90deg) translateZ(60px); }
+  .bottom { transform: rotateX(-90deg) translateZ(60px); }
+
+  .scene {
+    height: 250px;
+    bottom: -40px;
+  }
+
+  .tagsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .tag {
+    font-size: 10px;
+    padding: 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bentoSection {
+    padding: 60px 20px;
+  }
+
+  .gridContainer {
+    gap: 12px;
+    grid-auto-rows: minmax(240px, auto);
+  }
+
+  .card {
+    padding: 20px;
+    border-radius: 8px;
+  }
+
+  .headerTitle {
+    font-size: 28px;
+  }
+
+  .cardTitle {
+    font-size: 18px;
+    margin-bottom: 8px;
+  }
+
+  .cardDesc {
+    font-size: 12px;
+    margin-bottom: 16px;
+  }
+
+  .arrowIcon {
+    width: 16px;
+    height: 16px;
+    font-size: 8px;
+    margin-bottom: 12px;
+  }
+
+  /* تبسيط العناصر البصرية للشاشات الصغيرة جداً */
+  .cube {
+    width: 100px;
+    height: 100px;
+  }
+
+  .face {
+    width: 100px;
+    height: 100px;
+    background-size: 15px 15px;
+  }
+
+  .front  { transform: rotateY(0deg) translateZ(50px); }
+  .back   { transform: rotateY(180deg) translateZ(50px); }
+  .right  { transform: rotateY(90deg) translateZ(50px); }
+  .left   { transform: rotateY(-90deg) translateZ(50px); }
+  .top    { transform: rotateX(90deg) translateZ(50px); }
+  .bottom { transform: rotateX(-90deg) translateZ(50px); }
+
+  .scene {
+    height: 200px;
+    bottom: -30px;
+  }
+
+  .innerGlow {
+    width: 60px;
+    height: 60px;
+  }
+
+  .tagsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .thinkingInput {
+    padding: 10px;
+    font-size: 11px;
+  }
+
+  .browserWindow {
+    padding: 12px;
+  }
+}
+
+/* --- CUBE ANIMATION STYLES for "Your Product Delivered" --- */
+
+/* 3D Cube Container - scaled down for card */
+.scene {
+  perspective: 1000px;
+  width: 100%;
+  height: 350px; /* Adjust height for card */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  bottom: -60px; /* Position it nicely */
+  left: 0;
+  pointer-events: none; /* Let clicks pass through if needed */
+}
+
+.cube {
+  width: 160px; /* Smaller than full section version */
+  height: 160px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(-30deg) rotateY(45deg);
+  animation: floatAndRotate 12s infinite ease-in-out;
+}
+
+@keyframes floatAndRotate {
+  0% {
+    transform: rotateX(-20deg) rotateY(30deg) translateY(0);
+  }
+  50% {
+    transform: rotateX(-25deg) rotateY(60deg) translateY(-20px);
+  }
+  100% {
+    transform: rotateX(-20deg) rotateY(30deg) translateY(0);
+  }
+}
+
+.face {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 85, 255, 0.15);
+  /* The Dot Pattern */
+  background-image: radial-gradient(circle, rgba(0, 85, 255, 0.8) 1.5px, transparent 1.5px);
+  background-size: 20px 20px; /* Spacing of dots */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(0, 85, 255, 0.05);
+  backface-visibility: visible;
+}
+
+/* Face Transforms relative to 160px size */
+.front  { transform: rotateY(0deg) translateZ(80px); }
+.back   { transform: rotateY(180deg) translateZ(80px); }
+.right  { transform: rotateY(90deg) translateZ(80px); }
+.left   { transform: rotateY(-90deg) translateZ(80px); }
+.top    { transform: rotateX(90deg) translateZ(80px); }
+.bottom { transform: rotateX(-90deg) translateZ(80px); }
+
+/* Highlight effect inside the box */
+.innerGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  background: radial-gradient(circle, rgba(0, 85, 255, 0.4) 0%, transparent 70%);
+  filter: blur(20px);
+  pointer-events: none;
+}

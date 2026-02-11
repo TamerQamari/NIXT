@@ -1,0 +1,363 @@
+.section {
+  padding: 6rem 2rem;
+  position: relative;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 6rem;
+}
+
+.label {
+  color: #22c55e;
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.label::before {
+  content: '';
+  display: block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+.title {
+  font-size: 4rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.description {
+  font-size: 1.2rem;
+  color: #a1a1aa;
+  max-width: 540px;
+  line-height: 1.6;
+}
+
+.description strong {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* Timeline Visualization */
+.timelineWrapper {
+  position: relative;
+  height: 500px;
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, transparent 100%);
+}
+
+.timelinePlane {
+  position: relative;
+  width: 120%;
+  left: -10%;
+  height: 100%;
+  transform: perspective(1000px) rotateX(35deg) rotateY(0deg) rotateZ(-20deg) translateY(20px) translateX(50px);
+  transform-style: preserve-3d;
+}
+
+.gridLine {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.gridLine::before {
+  content: attr(data-date);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%) rotateZ(20deg); /* Counter rotate text */
+  color: #555;
+  font-size: 14px;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+/* Special styling for current date/highlighted date */
+.gridLine.highlight {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.gridLine.highlight::before {
+  color: #fff;
+  background: #333;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #555;
+}
+
+.itemsContainer {
+  position: absolute;
+  top: 50px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.itemBar {
+  position: absolute;
+  height: 48px;
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.05); /* Default glass */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  color: #ccc;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  transform-style: preserve-3d;
+  transition: transform 0.3s ease;
+}
+
+.itemBar:hover {
+  transform: translateZ(20px);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #fff;
+}
+
+/* Item variations */
+.itemPrototype {
+  top: 150px;
+  left: 15%;
+  width: 25%;
+  background: linear-gradient(90deg, rgba(50,50,50,0.6), rgba(80,80,80,0.6));
+}
+
+.itemBeta {
+  top: 80px;
+  left: 35%;
+  width: 30%;
+  border-color: rgba(39, 217, 245, 0.3); /* Cyan hint */
+}
+
+.itemBeta .icon {
+  color: var(--accent-cyan);
+}
+
+.itemRLHF {
+  top: 220px;
+  left: 50%;
+  width: 35%;
+}
+
+.icon {
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.diamond {
+  width: 8px;
+  height: 8px;
+  background: #666;
+  transform: rotate(45deg);
+}
+
+.diamondGreen {
+  width: 8px;
+  height: 8px;
+  border: 2px solid #22c55e;
+  transform: rotate(45deg);
+}
+
+.logoIcon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+/* Dashed vertical lines connecting items to dates */
+.verticalGuide {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1px dashed rgba(255,255,255,0.15);
+  pointer-events: none;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .section {
+    padding: 5rem 1.5rem;
+  }
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .description {
+    font-size: 1.1rem;
+  }
+
+  .timelineWrapper {
+    height: 400px;
+  }
+
+  .gridLine::before {
+    font-size: 12px;
+  }
+
+  .itemBar {
+    height: 42px;
+    font-size: 13px;
+    padding: 0 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 4rem 1rem;
+  }
+
+  .header {
+    margin-bottom: 4rem;
+  }
+
+  .label {
+    font-size: 0.8rem;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+
+  .description {
+    font-size: 1rem;
+    max-width: 100%;
+  }
+
+  .timelineWrapper {
+    height: 350px;
+  }
+
+  .timelinePlane {
+    transform: perspective(800px) rotateX(30deg) rotateY(0deg) rotateZ(-15deg) translateY(20px) translateX(30px);
+  }
+
+  .gridLine::before {
+    font-size: 11px;
+    top: -25px;
+  }
+
+  .itemBar {
+    height: 38px;
+    font-size: 12px;
+    padding: 0 12px;
+    border-radius: 19px;
+  }
+
+  .icon {
+    margin-right: 8px;
+  }
+
+  .diamond,
+  .diamondGreen {
+    width: 6px;
+    height: 6px;
+  }
+
+  .logoIcon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 3rem 1rem;
+  }
+
+  .header {
+    margin-bottom: 3rem;
+  }
+
+  .label {
+    font-size: 0.75rem;
+  }
+
+  .label::before {
+    width: 6px;
+    height: 6px;
+  }
+
+  .title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    font-size: 0.95rem;
+  }
+
+  .timelineWrapper {
+    height: 300px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, transparent 100%);
+  }
+
+  .timelinePlane {
+    transform: perspective(600px) rotateX(25deg) rotateY(0deg) rotateZ(-10deg) translateY(15px) translateX(20px);
+  }
+
+  .gridLine::before {
+    font-size: 10px;
+    top: -20px;
+  }
+
+  .itemBar {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 10px;
+    border-radius: 17px;
+  }
+
+  .itemBar:hover {
+    transform: translateZ(10px);
+  }
+
+  .icon {
+    margin-right: 6px;
+  }
+
+  .diamond,
+  .diamondGreen {
+    width: 5px;
+    height: 5px;
+  }
+
+  .logoIcon {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* إخفاء بعض التفاصيل الصغيرة على الشاشات الصغيرة جداً */
+  .verticalGuide {
+    display: none;
+  }
+}

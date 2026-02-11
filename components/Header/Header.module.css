@@ -1,0 +1,138 @@
+.mainNav {
+  position: absolute;
+  top: 60px;
+  right: 8%;
+  z-index: 1000;
+}
+
+.navList {
+  display: flex;
+  gap: 40px;
+  list-style: none;
+}
+
+.mainNav a {
+  color: var(--text-white);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: opacity 0.3s;
+}
+
+.mainNav a:hover,
+.mainNav a:focus {
+  opacity: 0.6;
+  outline: none;
+}
+
+.loginBtn {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 8px 16px;
+  border-radius: 6px;
+  margin-left: 10px;
+  transition: all 0.3s ease;
+}
+
+.loginBtn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #fff;
+  opacity: 1 !important;
+}
+
+/* Hamburger Menu Button */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 30px;
+  height: 25px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1001;
+  position: relative;
+}
+
+.hamburger span {
+  width: 30px;
+  height: 2px;
+  background: var(--text-white);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger.active span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.hamburger.active span:nth-child(2) {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.hamburger.active span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .mainNav {
+    top: 20px;
+    right: 5%;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+
+  .navList {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    max-width: 300px;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.98);
+    backdrop-filter: blur(20px);
+    flex-direction: column;
+    gap: 30px;
+    padding: 80px 30px;
+    transition: right 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.5);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .navList.open {
+    right: 0;
+  }
+
+  .navList li {
+    width: 100%;
+  }
+
+  .mainNav a {
+    display: block;
+    font-size: 18px;
+    padding: 10px 0;
+  }
+
+  .loginBtn {
+    margin-left: 0;
+    display: inline-block;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .navList {
+    width: 85%;
+  }
+
+  .mainNav a {
+    font-size: 16px;
+  }
+}

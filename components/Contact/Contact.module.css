@@ -1,0 +1,160 @@
+.contactMinimal {
+  text-align: center;
+  padding: 150px 8%;
+  background: linear-gradient(to bottom, transparent, rgba(0, 26, 77, 0.4), transparent);
+}
+
+.sectionTitle {
+  font-size: 48px;
+  font-weight: 200;
+  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  color: var(--text-dim);
+  font-weight: 200;
+  margin-bottom: 60px;
+}
+
+.contactForm {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.formGroup {
+  margin-bottom: 40px;
+}
+
+.formGroup input,
+.formGroup textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  padding: 15px 0;
+  color: white;
+  font-size: 18px;
+  font-weight: 200;
+  font-family: 'Poppins', sans-serif;
+  transition: border-color 0.3s;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+}
+
+.formGroup input::placeholder,
+.formGroup textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.submitBtn {
+  background: white;
+  color: black;
+  border: none;
+  padding: 18px 60px;
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.3s;
+  display: block;
+  margin: 0 auto;
+}
+
+.submitBtn:hover {
+  transform: scale(1.05);
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .contactMinimal {
+    padding: 100px 5%;
+  }
+
+  .sectionTitle {
+    font-size: 40px;
+  }
+
+  .contactForm {
+    max-width: 550px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contactMinimal {
+    padding: 80px 5%;
+    background: linear-gradient(to bottom, transparent, rgba(0, 26, 77, 0.3), transparent);
+  }
+
+  .sectionTitle {
+    font-size: 36px;
+    margin-bottom: 18px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    margin-bottom: 50px;
+  }
+
+  .contactForm {
+    max-width: 100%;
+  }
+
+  .formGroup {
+    margin-bottom: 35px;
+  }
+
+  .formGroup input,
+  .formGroup textarea {
+    font-size: 16px;
+    padding: 12px 0;
+  }
+
+  .submitBtn {
+    padding: 16px 50px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contactMinimal {
+    padding: 60px 20px;
+  }
+
+  .sectionTitle {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    margin-bottom: 40px;
+  }
+
+  .formGroup {
+    margin-bottom: 30px;
+  }
+
+  .formGroup input,
+  .formGroup textarea {
+    font-size: 15px;
+    padding: 10px 0;
+  }
+
+  .formGroup textarea {
+    min-height: 100px;
+  }
+
+  .submitBtn {
+    padding: 14px 40px;
+    font-size: 14px;
+    width: 100%;
+    max-width: 280px;
+  }
+}

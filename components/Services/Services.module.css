@@ -1,0 +1,138 @@
+.contentSection {
+  padding: 150px 8%;
+  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 10%, rgba(0,0,0,0.5) 90%, transparent);
+  backdrop-filter: blur(20px);
+}
+
+.sectionTitle {
+  font-size: 48px;
+  font-weight: 200;
+  margin-bottom: 80px;
+  text-align: center;
+  letter-spacing: -1px;
+}
+
+.servicesMinimal {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 80px;
+}
+
+.minimalCard h3 {
+  font-size: 24px;
+  font-weight: 400;
+  margin-bottom: 25px;
+  color: var(--accent-cyan);
+}
+
+.minimalCard p {
+  font-size: 17px;
+  font-weight: 200;
+  line-height: 1.9;
+  color: var(--text-dim);
+}
+
+.serviceCta {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--accent-cyan);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(39,217,245,0.4);
+  padding-bottom: 2px;
+}
+
+.serviceCta:hover,
+.serviceCta:focus {
+  color: white;
+  outline: none;
+}
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .contentSection {
+    padding: 100px 5%;
+  }
+
+  .sectionTitle {
+    font-size: 40px;
+    margin-bottom: 60px;
+  }
+
+  .servicesMinimal {
+    gap: 60px;
+  }
+
+  .minimalCard h3 {
+    font-size: 22px;
+  }
+
+  .minimalCard p {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contentSection {
+    padding: 80px 5%;
+  }
+
+  .sectionTitle {
+    font-size: 36px;
+    margin-bottom: 50px;
+  }
+
+  .servicesMinimal {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .minimalCard {
+    text-align: center;
+  }
+
+  .minimalCard h3 {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .minimalCard p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .serviceCta {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contentSection {
+    padding: 60px 20px;
+    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.3) 90%, transparent);
+  }
+
+  .sectionTitle {
+    font-size: 28px;
+    margin-bottom: 40px;
+  }
+
+  .servicesMinimal {
+    gap: 40px;
+  }
+
+  .minimalCard h3 {
+    font-size: 20px;
+    margin-bottom: 18px;
+  }
+
+  .minimalCard p {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .serviceCta {
+    font-size: 11px;
+  }
+}
