@@ -1,6 +1,7 @@
 'use client'
 
 import { FC, FormEvent, useState } from 'react'
+import emailjs from '@emailjs/browser'
 import styles from './Contact.module.css'
 
 const ContactSection: FC = () => {
@@ -9,6 +10,7 @@ const ContactSection: FC = () => {
     email: '',
     message: ''
   })
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -18,16 +20,38 @@ const ContactSection: FC = () => {
     }))
   }
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
-    alert('تم إرسال رسالتك بنجاح! سنتواصل معك خلال 24 ساعة.')
-    
-    setFormData({
-      name: '',
-      email: '',
-      message: ''
-    })
+    setIsSubmitting(true)
+
+    try {
+      // Replace these with your EmailJS credentials
+      const result = await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || 'YOUR_SERVICE_ID',
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || 'YOUR_TEMPLATE_ID',
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          message: formData.message,
+          to_name: 'NIXT Team',
+        },
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || 'YOUR_PUBLIC_KEY'
+      )
+
+      if (result.status === 200) {
+        alert('✅ تم إرسال رسالتك بنجاح! سنتواصل معك خلال 24 ساعة.')
+        setFormData({
+          name: '',
+          email: '',
+          message: ''
+        })
+      }
+    } catch (error) {
+      console.error('EmailJS Error:', error)
+      alert('❌ حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -68,7 +92,9 @@ const ContactSection: FC = () => {
             required 
           />
         </div>
-        <button type="submit" className={styles.submitBtn}>Send Request</button>
+        <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
+          {isSubmitting ? 'Sending...' : 'Send Request'}
+        </button>
       </form>
     </div>
   )

@@ -50,9 +50,9 @@ const Header: FC<HeaderProps> = ({ onSmoothScroll }) => {
           </a>
         </li>
         <li>
-          <a href="/login" className={styles.loginBtn}>
+          {/* <a href="/login" className={styles.loginBtn}>
             Log In
-          </a>
+          </a> */}
         </li>
       </ul>
     </nav>
