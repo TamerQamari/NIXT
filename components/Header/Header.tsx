@@ -1,6 +1,7 @@
 'use client'
 
 import { FC, useState } from 'react'
+import Link from 'next/link'
 import styles from './Header.module.css'
 
 interface HeaderProps {
@@ -50,9 +51,9 @@ const Header: FC<HeaderProps> = ({ onSmoothScroll }) => {
           </a>
         </li>
         <li>
-          {/* <a href="/login" className={styles.loginBtn}>
-            Log In
-          </a> */}
+          {/* <Link href="/dashboard" className={styles.loginBtn}>
+            Demo Login
+          </Link> */}
         </li>
       </ul>
     </nav>

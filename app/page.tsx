@@ -15,7 +15,7 @@ import ContactSection from '@/components/Contact'
 import ThemeSwitcher from '@/components/UI/ThemeSwitcher'
 
 export default function Home() {
-  const { nextTheme } = useTheme()
+  const { nextTheme, setTheme } = useTheme()
   const { scrollToSection } = useSmoothScroll()
 
   const handleContactClick = () => {
@@ -55,9 +55,6 @@ export default function Home() {
       <footer className="site-footer">
         © 2026 NIXT . ALL RIGHTS RESERVED.
       </footer>
-
-      {/* Theme Switcher */}
-      <ThemeSwitcher onThemeChange={nextTheme} />
     </main>
   )
 }

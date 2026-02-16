@@ -1,11 +1,21 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-cairo), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-cairo), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
 :root {
   --bg-color: #000000;
   --accent-blue: #0055ff;
   --accent-cyan: #27d9f5;
   --text-white: #ffffff;
   --text-dim: rgba(255, 255, 255, 0.6);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --bg-surface: rgba(255, 255, 255, 0.05);
+  --bg-hover: rgba(255, 255, 255, 0.08);
+  --nav-bg: rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -23,7 +33,7 @@ body {
   background-size: 100% 100%, 50px 50px, 50px 50px;
   background-attachment: fixed;
   color: var(--text-white);
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-cairo), var(--font-poppins), sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
   transition: background 0.8s cubic-bezier(0.4, 0, 0.2, 1);
