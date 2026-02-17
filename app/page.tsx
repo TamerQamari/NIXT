@@ -13,6 +13,7 @@ import ProductDirection from '@/components/ProductDirection'
 import StatsSection from '@/components/Stats'
 import ContactSection from '@/components/Contact'
 import ThemeSwitcher from '@/components/UI/ThemeSwitcher'
+import Footer from '@/components/Footer'
 
 export default function Home() {
   const { nextTheme, setTheme } = useTheme()
@@ -52,9 +53,7 @@ export default function Home() {
       <ContactSection />
 
       {/* Footer */}
-      <footer className="site-footer">
-        © 2026 NIXT . ALL RIGHTS RESERVED.
-      </footer>
+      <Footer />
     </main>
   )
 }

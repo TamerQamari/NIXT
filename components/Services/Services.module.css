@@ -1,74 +1,171 @@
 .contentSection {
-  padding: 150px 8%;
-  background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.5) 10%, rgba(0,0,0,0.5) 90%, transparent);
-  backdrop-filter: blur(20px);
+  padding: 120px 5%;
+  position: relative;
+  overflow: hidden;
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 80px;
+  position: relative;
+  z-index: 2;
 }
 
 .sectionTitle {
-  font-size: 48px;
-  font-weight: 200;
-  margin-bottom: 80px;
-  text-align: center;
-  letter-spacing: -1px;
+  font-family: var(--font-display), sans-serif;
+  font-size: 56px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  letter-spacing: -2px;
+  background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0.5));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.servicesMinimal {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 80px;
-}
-
-.minimalCard h3 {
-  font-size: 24px;
-  font-weight: 400;
-  margin-bottom: 25px;
-  color: var(--accent-cyan);
-}
-
-.minimalCard p {
-  font-size: 17px;
-  font-weight: 200;
-  line-height: 1.9;
+.sectionSubtitle {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 18px;
   color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
-.serviceCta {
-  display: inline-block;
-  margin-top: 14px;
-  font-size: 13px;
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+.serviceCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 48px 40px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.serviceCard:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+}
+
+.serviceCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+    rgba(255, 255, 255, 0.04),
+    transparent 40%
+  );
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+.serviceCard:hover::before {
+  opacity: 1;
+}
+
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.02));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 32px;
+  color: var(--text-white);
+  transition: all 0.3s ease;
+}
+
+.serviceCard:hover .iconWrapper {
+  border-color: var(--accent-cyan);
   color: var(--accent-cyan);
+  transform: scale(1.1);
+}
+
+.cardTitle {
+  font-family: var(--font-display), sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-white);
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+
+.cardDescription {
+  font-family: var(--font-sans), sans-serif;
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text-dim);
+  margin-bottom: 32px;
+  flex-grow: 1;
+}
+
+.learnMoreBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-white);
   text-decoration: none;
-  border-bottom: 1px solid rgba(39,217,245,0.4);
-  padding-bottom: 2px;
+  transition: gap 0.3s ease, color 0.3s ease;
+  cursor: pointer;
 }
 
-.serviceCta:hover,
-.serviceCta:focus {
-  color: white;
-  outline: none;
+.learnMoreBtn:hover {
+  gap: 12px;
+  color: var(--accent-cyan);
 }
 
-/* Responsive Styles */
+.arrowIcon {
+  transition: transform 0.3s ease;
+}
+
+.learnMoreBtn:hover .arrowIcon {
+  transform: translateX(4px);
+}
+
+/* Background Elements */
+.glowBg {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(39, 217, 245, 0.05) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
 @media (max-width: 1024px) {
-  .contentSection {
-    padding: 100px 5%;
-  }
-
   .sectionTitle {
-    font-size: 40px;
-    margin-bottom: 60px;
+    font-size: 42px;
   }
-
-  .servicesMinimal {
-    gap: 60px;
-  }
-
-  .minimalCard h3 {
-    font-size: 22px;
-  }
-
-  .minimalCard p {
-    font-size: 16px;
+  
+  .servicesGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -78,61 +175,15 @@
   }
 
   .sectionTitle {
-    font-size: 36px;
-    margin-bottom: 50px;
+    font-size: 32px;
   }
 
-  .servicesMinimal {
+  .servicesGrid {
     grid-template-columns: 1fr;
-    gap: 50px;
+    gap: 24px;
   }
 
-  .minimalCard {
-    text-align: center;
-  }
-
-  .minimalCard h3 {
-    font-size: 22px;
-    margin-bottom: 20px;
-  }
-
-  .minimalCard p {
-    font-size: 16px;
-    line-height: 1.8;
-  }
-
-  .serviceCta {
-    font-size: 12px;
-    margin-top: 12px;
-  }
-}
-
-@media (max-width: 480px) {
-  .contentSection {
-    padding: 60px 20px;
-    background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.3) 10%, rgba(0,0,0,0.3) 90%, transparent);
-  }
-
-  .sectionTitle {
-    font-size: 28px;
-    margin-bottom: 40px;
-  }
-
-  .servicesMinimal {
-    gap: 40px;
-  }
-
-  .minimalCard h3 {
-    font-size: 20px;
-    margin-bottom: 18px;
-  }
-
-  .minimalCard p {
-    font-size: 15px;
-    line-height: 1.7;
-  }
-
-  .serviceCta {
-    font-size: 11px;
+  .serviceCard {
+    padding: 32px 24px;
   }
 }

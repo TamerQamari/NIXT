@@ -1,0 +1,432 @@
+.container {
+  min-height: 100vh;
+  padding: 140px 8% 100px;
+  background: var(--bg-color);
+  color: var(--text-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Enhanced Background Effects */
+.container::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: 80%;
+  background: radial-gradient(circle at 50% 0%, rgba(0, 85, 255, 0.08) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.titleWrapper {
+  text-align: center;
+  margin-bottom: 5rem;
+  z-index: 1;
+  position: relative;
+  animation: fadeDown 0.8s ease-out;
+}
+
+.title {
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #fff 20%, #888 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.cardsContainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 3rem;
+  z-index: 1;
+  position: relative;
+  perspective: 1000px; /* For 3D feel */
+}
+
+/* Card Improvements */
+.card {
+  /* Using variables for dynamic spotlight position set via JS */
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  
+  position: relative;
+  background: rgba(20, 20, 20, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 24px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1), box-shadow 0.3s ease;
+  backdrop-filter: blur(12px);
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease-out backwards;
+}
+
+/* The Spotlight Glow Effect */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 255, 255, 0.06),
+    transparent 40%
+  );
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Enhanced Border Glow on Hover */
+.card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  background: radial-gradient(
+    600px circle at var(--mouse-x) var(--mouse-y),
+    rgba(255, 255, 255, 0.3),
+    transparent 40%
+  ) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+  z-index: 1;
+}
+
+.card:hover::after {
+  opacity: 1;
+}
+
+/* Staggered entrance animations */
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  z-index: 2; /* Bring forward */
+}
+
+/* Popular Card Style */
+.card.popular {
+  background: rgba(25, 25, 25, 0.6);
+  border-color: rgba(0, 85, 255, 0.3);
+  box-shadow: 0 0 30px rgba(0, 85, 255, 0.05);
+}
+
+.card.popular .badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: linear-gradient(135deg, var(--accent-blue), var(--accent-cyan));
+  color: #000;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 85, 255, 0.3);
+}
+
+/* Pricing Typography */
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  z-index: 2;
+}
+
+.priceWrapper {
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.currency {
+  font-size: 1.5rem;
+  vertical-align: top;
+  margin-right: 4px;
+  color: var(--text-dim);
+}
+
+.priceRange {
+  font-size: 2.75rem;
+  font-weight: 700;
+  color: var(--text-white);
+  line-height: 1;
+  background: linear-gradient(180deg, #fff 0%, #ccc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  margin-bottom: 2rem;
+  z-index: 2;
+}
+
+/* Features List */
+.features {
+  list-style: none;
+  width: 100%;
+  text-align: left;
+  margin-bottom: 2.5rem;
+  flex-grow: 1;
+  z-index: 2;
+}
+
+.features li {
+  padding: 0.9rem 0; /* More spacing */
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: color 0.2s;
+}
+
+.features li:hover {
+  color: var(--text-white);
+}
+
+.checkIcon {
+  color: var(--accent-cyan);
+  background: rgba(39, 217, 245, 0.1);
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  border: 1px solid rgba(39, 217, 245, 0.2);
+}
+
+/* Buttons */
+.placeholderBtn {
+  margin-top: auto;
+  padding: 16px 28px;
+  border-radius: 12px; /* Smoother radius */
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+  width: 100%;
+  cursor: pointer;
+  z-index: 2;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Button Pulse/Shine Effect */
+.placeholderBtn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  transition: left 0.5s;
+}
+
+.card:hover .placeholderBtn::before {
+  left: 100%;
+}
+
+.card:hover .placeholderBtn {
+  background: var(--text-white);
+  color: #000;
+  border-color: var(--text-white);
+}
+
+.card.popular .placeholderBtn {
+  background: var(--accent-blue);
+  border-color: var(--accent-blue);
+}
+
+.card.popular:hover .placeholderBtn {
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+  color: #000;
+  box-shadow: 0 0 20px rgba(39, 217, 245, 0.4);
+}
+
+
+/* Bottom offer section */
+.bottomCard {
+  width: 100%;
+  max-width: 1200px;
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.6) 0%, rgba(10, 10, 10, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  padding: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.8s ease-out 0.4s backwards; /* Delayed entrance */
+}
+
+/* Animated gradient border/line */
+.bottomCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, var(--accent-blue), var(--accent-cyan));
+  box-shadow: 0 0 15px var(--accent-blue);
+}
+
+.bottomContent {
+  flex: 1;
+  padding-right: 2rem;
+  z-index: 2;
+}
+
+.bottomTitle {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-white);
+}
+
+.bottomText {
+  font-size: 1rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.makeOfferBtn {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #0033aa 100%);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px 40px;
+  border-radius: 50px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  display: inline-block;
+  text-decoration: none;
+  box-shadow: 0 10px 30px rgba(0, 85, 255, 0.25);
+  white-space: nowrap;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+}
+
+.makeOfferBtn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 40px rgba(0, 85, 255, 0.4);
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-blue) 100%);
+  color: #000;
+}
+
+/* Animations Logic */
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 900px) {
+  .cardsContainer {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .card.popular {
+    transform: scale(1);
+  }
+  
+  .card.popular:hover {
+    transform: translateY(-8px);
+  }
+  
+  .bottomCard {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  .bottomContent {
+    padding-right: 0;
+  }
+  
+  .bottomCard::before {
+    width: 100%;
+    height: 4px;
+    top: 0;
+    left: 0;
+  }
+
+  .title {
+    font-size: 2.5rem;
+  }
+  
+  .container {
+    padding-top: 120px;
+  }
+}

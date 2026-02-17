@@ -6,10 +6,12 @@ import AnalyticsDashboard from '@/components/Dashboard/AnalyticsDashboard'
 import FinancialDashboard from '@/components/Dashboard/FinancialDashboard'
 import SupportCenter from '@/components/Dashboard/SupportCenter'
 import DashboardSettings from '@/components/Dashboard/DashboardSettings'
+import DashboardLogin from '@/components/Dashboard/DashboardLogin'
 import styles from '@/components/Dashboard/Dashboard.module.css'
 import ThemeSwitcher from '@/components/UI/ThemeSwitcher'
 import { useTheme } from '@/hooks/useTheme'
 import { LanguageProvider, useLanguage } from '@/hooks/useLanguage'
+import { useAuth } from '@/hooks/useAuth'
 
 interface DashboardSection {
   id: string
@@ -30,8 +32,10 @@ interface DashboardSettingsType {
 function DashboardContent() {
   // Use translations hook
   const { t, language, setLanguage, dir } = useLanguage()
+  const { dashboardSession, isLoggedIn, logoutFromDashboard } = useAuth()
   
   const [showSettings, setShowSettings] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
   
   const { nextTheme, setTheme, currentTheme } = useTheme()
 
@@ -44,8 +48,6 @@ function DashboardContent() {
     timezone: 'UTC'
   })
 
-  // We need to keep sections state in sync with translations if names are dynamic
-  // But component references can't easily change. Let's just render the name dynamically in the JSX.
   const sectionsList = [
     { id: 'project', component: ProjectOverview, nameKey: 'project' },
     { id: 'analytics', component: AnalyticsDashboard, nameKey: 'analytics' },
@@ -55,6 +57,22 @@ function DashboardContent() {
 
   const [enabledSectionIds, setEnabledSectionIds] = useState<string[]>(
     ['project', 'analytics', 'financial', 'support']
+  )
+
+  // All hooks are above — now we can do conditional returns
+
+  // Check if user is logged in
+  const userIsLoggedIn = isLoggedIn && dashboardSession
+
+  // If not logged in, show login page
+  if (!userIsLoggedIn && !isAuthenticated) {
+    return <DashboardLogin onLoginSuccess={() => setIsAuthenticated(true)} />
+  }
+
+  // Filter sections based on user permissions
+  const userAllowedSections = dashboardSession?.dashboardSections || []
+  const availableSections = sectionsList.filter(
+    s => userAllowedSections.length === 0 || userAllowedSections.includes(s.id)
   )
 
   const toggleSection = (sectionId: string) => {
@@ -107,8 +125,34 @@ function DashboardContent() {
         </div>
         
         <div className={styles.headerControls}>
+          {/* User Info */}
+          {dashboardSession && (
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '10px',
+              padding: '6px 14px',
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '10px',
+              fontSize: '0.85rem',
+              color: 'var(--text-dim)'
+            }}>
+              <span style={{ 
+                width: '8px', 
+                height: '8px', 
+                borderRadius: '50%', 
+                background: '#00C781',
+                display: 'inline-block'
+              }} />
+              <span>{dashboardSession.name}</span>
+              <span style={{ opacity: 0.5 }}>|</span>
+              <span style={{ color: '#7042f8', fontWeight: 600 }}>{dashboardSession.role}</span>
+            </div>
+          )}
+
           <div className={styles.sectionsToggle}>
-            {sectionsList.map((section) => (
+            {availableSections.map((section) => (
               <button
                 key={section.id}
                 className={`${styles.toggleBtn} ${enabledSectionIds.includes(section.id) ? styles.active : ''}`}
@@ -125,11 +169,27 @@ function DashboardContent() {
           >
             ⚙️ {t.dashboard.settings}
           </button>
+
+          {/* Logout Button */}
+          <button
+            className={styles.settingsBtn}
+            onClick={() => {
+              logoutFromDashboard()
+              setIsAuthenticated(false)
+            }}
+            style={{ 
+              background: 'rgba(255, 68, 68, 0.1)', 
+              borderColor: 'rgba(255, 68, 68, 0.2)',
+              color: '#ff6b6b'
+            }}
+          >
+            {t.login.logout}
+          </button>
         </div>
       </div>
 
       <div className={styles.dashboardContent}>
-        {sectionsList.map((section) => {
+        {availableSections.map((section) => {
           if (!enabledSectionIds.includes(section.id)) return null
           
           const Component = section.component

@@ -54,50 +54,7 @@ const ContactSection: FC = () => {
     }
   }
 
-  return (
-    <div id="contact" className={styles.contactMinimal}>
-      <h2 className={styles.sectionTitle}>Begin Your Digital Journey</h2>
-      <p className={styles.subtitle}>
-        Send your project details and we will contact you within 24 hours.
-      </p>
-      
-      <form className={styles.contactForm} onSubmit={handleSubmit}>
-        <div className={styles.formGroup}>
-          <input 
-            type="text" 
-            name="name"
-            placeholder="Full Name" 
-            value={formData.name}
-            onChange={handleInputChange}
-            required 
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <input 
-            type="email" 
-            name="email"
-            placeholder="Email Address" 
-            value={formData.email}
-            onChange={handleInputChange}
-            required 
-          />
-        </div>
-        <div className={styles.formGroup}>
-          <textarea 
-            name="message"
-            rows={4} 
-            placeholder="Tell us about your project..."
-            value={formData.message}
-            onChange={handleInputChange}
-            required 
-          />
-        </div>
-        <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-          {isSubmitting ? 'Sending...' : 'Send Request'}
-        </button>
-      </form>
-    </div>
-  )
+  return null
 }
 
 export default ContactSection

@@ -51,9 +51,14 @@ const Header: FC<HeaderProps> = ({ onSmoothScroll }) => {
           </a>
         </li>
         <li>
-          {/* <Link href="/dashboard" className={styles.loginBtn}>
-            Demo Login
-          </Link> */}
+          <Link href="/pricing">
+            Pricing
+          </Link>
+        </li>
+        <li>
+          <Link href="/login" className={styles.loginBtn}>
+            Login
+          </Link>
         </li>
       </ul>
     </nav>

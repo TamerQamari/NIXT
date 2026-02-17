@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
 import { Poppins, Cairo } from "next/font/google";
 import Script from "next/script";
+import { TawkChatButton } from "@/components/UI";
+import { LanguageProvider } from "@/hooks/useLanguage";
+import { AuthProvider } from "@/hooks/useAuth";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -45,7 +48,14 @@ export default function RootLayout({
         <link rel="preload" href="/IMS.png" as="image" />
       </head>
       <body className={`${poppins.variable} ${cairo.variable}`}>
-        {children}
+        <LanguageProvider>
+          <AuthProvider>
+            {children}
+            
+            {/* زر الدردشة المباشرة */}
+            <TawkChatButton />
+          </AuthProvider>
+        </LanguageProvider>
         
         {/* Tawk.to Live Chat */}
         <Script
@@ -62,6 +72,11 @@ export default function RootLayout({
                 s1.setAttribute('crossorigin','*');
                 s0.parentNode.insertBefore(s1,s0);
               })();
+              
+              // إخفاء الويدجت الافتراضي
+              Tawk_API.onLoad = function(){
+                Tawk_API.hideWidget();
+              };
             `,
           }}
         />

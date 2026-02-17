@@ -90,10 +90,16 @@ export const useTheme = () => {
     const saved = localStorage.getItem('nixt-theme')
     if (saved) {
       const index = parseInt(saved)
-      if (index >= 0 && index < themeConfigs.length) {
+      // If saved theme is the white theme (4), reset to default dark theme
+      if (index === 4) {
+        localStorage.setItem('nixt-theme', '0')
+        setCurrentTheme(0)
+        applyTheme(0)
+      } else if (index >= 0 && index < themeConfigs.length) {
         setCurrentTheme(index)
-        // applyTheme(index) // Will be called by next useEffect
       }
+    } else {
+      applyTheme(0)
     }
   }, [])
 
