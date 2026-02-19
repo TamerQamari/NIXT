@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { LanguageProvider, useLanguage } from '@/hooks/useLanguage'
 import { useAuth } from '@/hooks/useAuth'
 import DashboardLogin from '@/components/Dashboard/DashboardLogin'
@@ -21,6 +21,18 @@ import {
   UserIcon
 } from '@/components/UI/ControllerIcons'
 import styles from './Controllers.module.css'
+import {
+  type Project as APIProject,
+  type ProjectStatistics,
+  type CreateProjectPayload,
+  type UpdateProjectPayload,
+  getAllProjects,
+  getProjectStatistics,
+  getProjectById,
+  createProject as apiCreateProject,
+  updateProject as apiUpdateProject,
+  deleteProject as apiDeleteProject,
+} from '../Projects/apiFunctions'
 
 // Define interfaces for type safety
 interface Client {
@@ -35,19 +47,7 @@ interface Client {
   lastActivity: string
 }
 
-interface Project {
-  id: string
-  name: string
-  client: string
-  clientEmail: string
-  progress: number
-  budget: number
-  spent: number
-  status: 'active' | 'completed' | 'pending' | 'on-hold'
-  deadline: string
-  priority: 'low' | 'medium' | 'high' | 'urgent'
-  team: number
-}
+// Project type is now imported from ../Projects/apiFunctions as APIProject
 
 interface Transaction {
   id: string
@@ -99,25 +99,31 @@ function ControllersContent() {
   const [newManagerEmail, setNewManagerEmail] = useState('')
   const [newManagerName, setNewManagerName] = useState('')
 
+  // Project data state (from API)
+  const [projects, setProjects] = useState<APIProject[]>([])
+  const [projectStats, setProjectStats] = useState<ProjectStatistics['data'] | null>(null)
+  const [projectsLoading, setProjectsLoading] = useState(false)
+  const [projectError, setProjectError] = useState<string | null>(null)
+  const [projectSuccess, setProjectSuccess] = useState<string | null>(null)
+  const [projectActionLoading, setProjectActionLoading] = useState(false)
+
   // Project edit form state
-  const [editingProject, setEditingProject] = useState<Project | null>(null)
+  const [editingProject, setEditingProject] = useState<APIProject | null>(null)
   const [editProjectName, setEditProjectName] = useState('')
-  const [editProjectClient, setEditProjectClient] = useState('')
-  const [editProjectProgress, setEditProjectProgress] = useState(0)
-  const [editProjectBudget, setEditProjectBudget] = useState(0)
+  const [editProjectPrice, setEditProjectPrice] = useState(0)
   const [editProjectSpent, setEditProjectSpent] = useState(0)
-  const [editProjectStatus, setEditProjectStatus] = useState<Project['status']>('active')
+  const [editProjectStatus, setEditProjectStatus] = useState<APIProject['status']>('active')
   const [editProjectDeadline, setEditProjectDeadline] = useState('')
-  const [editProjectPriority, setEditProjectPriority] = useState<Project['priority']>('medium')
-  const [editProjectTeam, setEditProjectTeam] = useState(0)
+  const [editProjectPriority, setEditProjectPriority] = useState<APIProject['priority']>('medium')
 
   // Add project form state
   const [showAddProjectForm, setShowAddProjectForm] = useState(false)
   const [newProjectName, setNewProjectName] = useState('')
-  const [newProjectClient, setNewProjectClient] = useState('')
-  const [newProjectBudget, setNewProjectBudget] = useState('')
+  const [newProjectUserId, setNewProjectUserId] = useState('')
+  const [newProjectPrice, setNewProjectPrice] = useState('')
   const [newProjectDeadline, setNewProjectDeadline] = useState('')
-  const [newProjectPriority, setNewProjectPriority] = useState<Project['priority']>('medium')
+  const [newProjectPriority, setNewProjectPriority] = useState<APIProject['priority']>('medium')
+  const [newProjectStatus, setNewProjectStatus] = useState<APIProject['status']>('pending')
 
   // Mock data - في التطبيق الحقيقي، ستأتي هذه البيانات من API
   const [clients, setClients] = useState<Client[]>([
@@ -178,60 +184,7 @@ function ControllersContent() {
     },
   ])
 
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: '1',
-      name: 'منصة التجارة الإلكترونية - NIXT Store',
-      client: 'شركة الرياض التقنية',
-      clientEmail: 'info@riyadhtech.sa',
-      progress: 75,
-      budget: 150000,
-      spent: 112500,
-      status: 'active',
-      deadline: '2026-04-15',
-      priority: 'high',
-      team: 6
-    },
-    {
-      id: '2',
-      name: 'تطبيق إدارة المشاريع',
-      client: 'مؤسسة النور للتطوير',
-      clientEmail: 'contact@alnoor.com',
-      progress: 45,
-      budget: 95000,
-      spent: 42750,
-      status: 'active',
-      deadline: '2026-05-20',
-      priority: 'medium',
-      team: 4
-    },
-    {
-      id: '3',
-      name: 'نظام إدارة المحتوى CMS',
-      client: 'شركة الابتكار الذكي',
-      clientEmail: 'hello@smartinnovate.sa',
-      progress: 100,
-      budget: 120000,
-      spent: 118000,
-      status: 'completed',
-      deadline: '2026-01-30',
-      priority: 'low',
-      team: 5
-    },
-    {
-      id: '4',
-      name: 'Enterprise Dashboard System',
-      client: 'Omega Digital Solutions',
-      clientEmail: 'info@omega.com',
-      progress: 20,
-      budget: 85000,
-      spent: 17000,
-      status: 'active',
-      deadline: '2026-06-10',
-      priority: 'urgent',
-      team: 7
-    },
-  ])
+  // Projects data is now fetched from API (see useEffect below)
 
   const transactions: Transaction[] = [
     {
@@ -322,6 +275,49 @@ function ControllersContent() {
     },
   ]
 
+  // ==================== Projects API Fetching ====================
+
+  const fetchProjects = useCallback(async () => {
+    try {
+      setProjectsLoading(true)
+      setProjectError(null)
+      const res = await getAllProjects({ limit: 50, offset: 0 })
+      if (res.success) {
+        setProjects(res.data)
+      }
+    } catch (err) {
+      setProjectError(isRTL ? 'فشل في تحميل المشاريع' : 'Failed to load projects')
+      console.error('Error fetching projects:', err)
+    } finally {
+      setProjectsLoading(false)
+    }
+  }, [isRTL])
+
+  const fetchProjectStats = useCallback(async () => {
+    try {
+      const res = await getProjectStatistics()
+      if (res.success) {
+        setProjectStats(res.data)
+      }
+    } catch (err) {
+      console.error('Error fetching project statistics:', err)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchProjects()
+    fetchProjectStats()
+  }, [fetchProjects, fetchProjectStats])
+
+  const showProjectSuccess = (msg: string) => {
+    setProjectSuccess(msg)
+    setTimeout(() => setProjectSuccess(null), 3000)
+  }
+
+  const refreshProjectData = async () => {
+    await Promise.all([fetchProjects(), fetchProjectStats()])
+  }
+
   // Sync data to shared storage for dashboard
   useEffect(() => {
     updateSharedData({
@@ -333,74 +329,113 @@ function ControllersContent() {
     })
   }, [clients, projects]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Compute overall progress for a project
+  const computeOverallProgress = (project: APIProject) => {
+    if (!project.progress || project.progress.length === 0) return 0
+    const total = project.progress.reduce((sum, p) => sum + p.percent, 0)
+    return Math.round(total / project.progress.length)
+  }
+
   // Open edit modal for a project
-  const openEditProject = (project: Project) => {
+  const openEditProject = (project: APIProject) => {
     setEditingProject(project)
     setEditProjectName(project.name)
-    setEditProjectClient(project.clientEmail)
-    setEditProjectProgress(project.progress)
-    setEditProjectBudget(project.budget)
+    setEditProjectPrice(project.price)
     setEditProjectSpent(project.spent)
     setEditProjectStatus(project.status)
-    setEditProjectDeadline(project.deadline)
+    setEditProjectDeadline(project.deadline.split('T')[0])
     setEditProjectPriority(project.priority)
-    setEditProjectTeam(project.team)
   }
 
-  // Save edited project
-  const saveEditedProject = () => {
+  // Save edited project via API
+  const saveEditedProject = async () => {
     if (!editingProject) return
-    const selectedClient = clients.find(c => c.email === editProjectClient)
-    const updatedProject: Project = {
-      ...editingProject,
-      name: editProjectName,
-      client: selectedClient?.name || editingProject.client,
-      clientEmail: editProjectClient,
-      progress: editProjectProgress,
-      budget: editProjectBudget,
-      spent: editProjectSpent,
-      status: editProjectStatus,
-      deadline: editProjectDeadline,
-      priority: editProjectPriority,
-      team: editProjectTeam,
+    try {
+      setProjectActionLoading(true)
+      const payload: UpdateProjectPayload = {}
+      if (editProjectName !== editingProject.name) payload.name = editProjectName
+      if (editProjectPrice !== editingProject.price) payload.price = editProjectPrice
+      if (editProjectSpent !== editingProject.spent) payload.spent = editProjectSpent
+      if (editProjectDeadline !== editingProject.deadline.split('T')[0]) payload.deadline = new Date(editProjectDeadline).toISOString()
+      if (editProjectPriority !== editingProject.priority) payload.priority = editProjectPriority
+      if (editProjectStatus !== editingProject.status) payload.status = editProjectStatus
+
+      if (Object.keys(payload).length === 0) {
+        setEditingProject(null)
+        return
+      }
+
+      const res = await apiUpdateProject(editingProject.id, payload)
+      if (res.success) {
+        showProjectSuccess(isRTL ? 'تم تحديث المشروع بنجاح' : 'Project updated successfully')
+        setEditingProject(null)
+        await refreshProjectData()
+      }
+    } catch (err) {
+      setProjectError(isRTL ? 'فشل في تحديث المشروع' : 'Failed to update project')
+    } finally {
+      setProjectActionLoading(false)
     }
-    setProjects(prev => prev.map(p => p.id === editingProject.id ? updatedProject : p))
-    setEditingProject(null)
   }
 
-  // Add new project
-  const addNewProject = () => {
-    const selectedClient = clients.find(c => c.email === newProjectClient)
-    if (!newProjectName || !selectedClient) return
-    const newProject: Project = {
-      id: Date.now().toString(),
-      name: newProjectName,
-      client: selectedClient.name,
-      clientEmail: selectedClient.email,
-      progress: 0,
-      budget: parseFloat(newProjectBudget) || 0,
-      spent: 0,
-      status: 'pending',
-      deadline: newProjectDeadline || new Date(Date.now() + 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      priority: newProjectPriority,
-      team: 1,
+  // Add new project via API
+  const addNewProject = async () => {
+    if (!newProjectName || !newProjectUserId || !newProjectPrice || !newProjectDeadline) return
+    try {
+      setProjectActionLoading(true)
+      const payload: CreateProjectPayload = {
+        name: newProjectName,
+        user_id: newProjectUserId,
+        price: parseFloat(newProjectPrice),
+        deadline: new Date(newProjectDeadline).toISOString(),
+        priority: newProjectPriority,
+        status: newProjectStatus,
+      }
+      const res = await apiCreateProject(payload)
+      if (res.success) {
+        showProjectSuccess(isRTL ? 'تم إنشاء المشروع بنجاح' : 'Project created successfully')
+        setShowAddProjectForm(false)
+        setNewProjectName('')
+        setNewProjectUserId('')
+        setNewProjectPrice('')
+        setNewProjectDeadline('')
+        setNewProjectPriority('medium')
+        setNewProjectStatus('pending')
+        await refreshProjectData()
+      }
+    } catch (err) {
+      setProjectError(isRTL ? 'فشل في إنشاء المشروع' : 'Failed to create project')
+    } finally {
+      setProjectActionLoading(false)
     }
-    setProjects(prev => [...prev, newProject])
-    setShowAddProjectForm(false)
-    setNewProjectName('')
-    setNewProjectClient('')
-    setNewProjectBudget('')
-    setNewProjectDeadline('')
-    setNewProjectPriority('medium')
   }
+
+  // Delete project via API
+  const handleDeleteProject = async (id: string) => {
+    try {
+      setProjectActionLoading(true)
+      const res = await apiDeleteProject(id)
+      if (res.success) {
+        showProjectSuccess(isRTL ? 'تم حذف المشروع بنجاح' : 'Project deleted successfully')
+        await refreshProjectData()
+      }
+    } catch (err) {
+      setProjectError(isRTL ? 'فشل في حذف المشروع' : 'Failed to delete project')
+    } finally {
+      setProjectActionLoading(false)
+    }
+  }
+
+  // Confirm delete state
+  const [confirmDeleteProject, setConfirmDeleteProject] = useState<string | null>(null)
 
   // Calculate statistics
   const stats = useMemo(() => {
     const totalClients = clients.length
     const activeClients = clients.filter(c => c.status === 'active').length
-    const totalProjects = projects.length
-    const activeProjects = projects.filter(p => p.status === 'active').length
-    const completedProjects = projects.filter(p => p.status === 'completed').length
+    const totalProjects = projectStats?.total ?? projects.length
+    const activeProjects = projectStats?.byStatus.active ?? projects.filter(p => p.status === 'active').length
+    const completedProjects = projectStats?.byStatus.completed ?? projects.filter(p => p.status === 'completed').length
     
     const totalRevenue = transactions
       .filter(t => t.type === 'income' && t.status === 'completed')
@@ -425,7 +460,7 @@ function ControllersContent() {
       totalExpenses,
       netProfit: totalRevenue - totalExpenses
     }
-  }, [clients, projects, transactions])
+  }, [clients, projects, transactions, projectStats])
 
   // Filter clients based on search
   const filteredClients = useMemo(() => {
@@ -443,7 +478,8 @@ function ControllersContent() {
       inactive: '#FF4444',
       pending: '#FF8C00',
       completed: '#00C781',
-      'on-hold': '#666',
+      onhold: '#94a3b8',
+      'on-hold': '#94a3b8',
       failed: '#FF4444'
     }
     return colors[status] || '#666'
@@ -963,6 +999,31 @@ function ControllersContent() {
         {/* Projects Tab */}
         {activeTab === 'projects' && (
           <div className={styles.projectsSection}>
+            {/* Project Success Toast */}
+            {projectSuccess && (
+              <div style={{
+                position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
+                background: 'linear-gradient(135deg, #00C781, #0070F3)', color: '#fff',
+                padding: '12px 28px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                boxShadow: '0 8px 30px rgba(0, 199, 129, 0.3)', animation: 'fadeIn 0.3s ease',
+              }}>
+                {projectSuccess}
+              </div>
+            )}
+
+            {/* Project Error Toast */}
+            {projectError && (
+              <div style={{
+                position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)', zIndex: 9999,
+                background: 'linear-gradient(135deg, #FF4444, #FF8C00)', color: '#fff',
+                padding: '12px 28px', borderRadius: '12px', fontWeight: 600, fontSize: '0.95rem',
+                boxShadow: '0 8px 30px rgba(255, 68, 68, 0.3)', animation: 'fadeIn 0.3s ease',
+                cursor: 'pointer',
+              }} onClick={() => setProjectError(null)}>
+                {projectError}
+              </div>
+            )}
+
             <div className={styles.sectionHeader}>
               <h2 className={styles.sectionTitle}>{t.controllers.projects.title}</h2>
               <button className={styles.primaryBtn} onClick={() => setShowAddProjectForm(true)}>{t.controllers.projects.add}</button>
@@ -971,12 +1032,12 @@ function ControllersContent() {
             {/* Add New Project Form */}
             {showAddProjectForm && (
               <div className={styles.addForm} style={{ marginBottom: '20px' }}>
-                <h3 style={{ marginBottom: '15px', color: 'var(--text-white)' }}>
+                <h3 style={{ marginBottom: '15px', color: '#fff' }}>
                   {t.controllers.projects.add}
                 </h3>
                 <div className={styles.formGrid}>
                   <div className={styles.formGroup}>
-                    <label>{t.controllers.projects.name}</label>
+                    <label>{t.controllers.projects.name} *</label>
                     <input
                       type="text"
                       value={newProjectName}
@@ -986,30 +1047,28 @@ function ControllersContent() {
                     />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>{t.controllers.projects.client}</label>
-                    <select
-                      value={newProjectClient}
-                      onChange={(e) => setNewProjectClient(e.target.value)}
+                    <label>{isRTL ? 'معرف المستخدم (UUID)' : 'User ID (UUID)'} *</label>
+                    <input
+                      type="text"
+                      value={newProjectUserId}
+                      onChange={(e) => setNewProjectUserId(e.target.value)}
+                      placeholder="e.g. 550e8400-e29b-41d4-a716-446655440000"
                       className={styles.formInput}
-                    >
-                      <option value="">{isRTL ? 'اختر عميل...' : 'Select client...'}</option>
-                      {clients.map(c => (
-                        <option key={c.id} value={c.email}>{c.name} ({c.email})</option>
-                      ))}
-                    </select>
+                    />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>{t.controllers.projects.budget}</label>
+                    <label>{isRTL ? 'السعر (ر.س)' : 'Price (SAR)'} *</label>
                     <input
                       type="number"
-                      value={newProjectBudget}
-                      onChange={(e) => setNewProjectBudget(e.target.value)}
+                      min="0"
+                      value={newProjectPrice}
+                      onChange={(e) => setNewProjectPrice(e.target.value)}
                       placeholder="0"
                       className={styles.formInput}
                     />
                   </div>
                   <div className={styles.formGroup}>
-                    <label>{t.controllers.projects.deadline}</label>
+                    <label>{t.controllers.projects.deadline} *</label>
                     <input
                       type="date"
                       value={newProjectDeadline}
@@ -1021,7 +1080,7 @@ function ControllersContent() {
                     <label>{t.controllers.projects.priority}</label>
                     <select
                       value={newProjectPriority}
-                      onChange={(e) => setNewProjectPriority(e.target.value as Project['priority'])}
+                      onChange={(e) => setNewProjectPriority(e.target.value as APIProject['priority'])}
                       className={styles.formInput}
                     >
                       <option value="low">{isRTL ? 'منخفضة' : 'Low'}</option>
@@ -1030,10 +1089,28 @@ function ControllersContent() {
                       <option value="urgent">{isRTL ? 'عاجلة' : 'Urgent'}</option>
                     </select>
                   </div>
+                  <div className={styles.formGroup}>
+                    <label>{isRTL ? 'الحالة' : 'Status'}</label>
+                    <select
+                      value={newProjectStatus}
+                      onChange={(e) => setNewProjectStatus(e.target.value as APIProject['status'])}
+                      className={styles.formInput}
+                    >
+                      <option value="pending">{isRTL ? 'معلق' : 'Pending'}</option>
+                      <option value="active">{isRTL ? 'نشط' : 'Active'}</option>
+                      <option value="completed">{isRTL ? 'مكتمل' : 'Completed'}</option>
+                      <option value="onhold">{isRTL ? 'متوقف' : 'On Hold'}</option>
+                    </select>
+                  </div>
                 </div>
                 <div style={{ display: 'flex', gap: '10px', marginTop: '15px' }}>
-                  <button className={styles.primaryBtn} onClick={addNewProject}>
-                    <SaveIcon size={16} /> {t.controllers.projects.add}
+                  <button
+                    className={styles.primaryBtn}
+                    onClick={addNewProject}
+                    disabled={projectActionLoading || !newProjectName || !newProjectUserId || !newProjectPrice || !newProjectDeadline}
+                    style={{ opacity: projectActionLoading || !newProjectName || !newProjectUserId || !newProjectPrice || !newProjectDeadline ? 0.5 : 1 }}
+                  >
+                    {projectActionLoading ? (isRTL ? 'جاري الإنشاء...' : 'Creating...') : (<><SaveIcon size={16} /> {t.controllers.projects.add}</>)}
                   </button>
                   <button className={styles.secondaryBtn} onClick={() => setShowAddProjectForm(false)}>
                     {isRTL ? 'إلغاء' : 'Cancel'}
@@ -1046,9 +1123,17 @@ function ControllersContent() {
             {editingProject && (
               <div className={styles.modalOverlay} onClick={() => setEditingProject(null)}>
                 <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                  <h3 style={{ marginBottom: '20px', color: 'var(--text-white)' }}>
-                    {t.controllers.projects.edit}: {editingProject.name}
-                  </h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                    <h3 style={{ margin: 0, color: '#fff', fontSize: '1.3rem' }}>
+                      {t.controllers.projects.edit}: {editingProject.name}
+                    </h3>
+                    <button
+                      onClick={() => setEditingProject(null)}
+                      style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '1.5rem', cursor: 'pointer' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
                   <div className={styles.formGrid}>
                     <div className={styles.formGroup}>
                       <label>{t.controllers.projects.name}</label>
@@ -1060,44 +1145,20 @@ function ControllersContent() {
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>{t.controllers.projects.client}</label>
-                      <select
-                        value={editProjectClient}
-                        onChange={(e) => setEditProjectClient(e.target.value)}
-                        className={styles.formInput}
-                      >
-                        {clients.map(c => (
-                          <option key={c.id} value={c.email}>{c.name} ({c.email})</option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label>{t.controllers.projects.progress}</label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <input
-                          type="range"
-                          min="0"
-                          max="100"
-                          value={editProjectProgress}
-                          onChange={(e) => setEditProjectProgress(parseInt(e.target.value))}
-                          style={{ flex: 1 }}
-                        />
-                        <span style={{ color: 'var(--text-white)', fontWeight: 600, minWidth: '45px' }}>{editProjectProgress}%</span>
-                      </div>
-                    </div>
-                    <div className={styles.formGroup}>
-                      <label>{t.controllers.projects.budget}</label>
+                      <label>{isRTL ? 'السعر (ر.س)' : 'Price (SAR)'}</label>
                       <input
                         type="number"
-                        value={editProjectBudget}
-                        onChange={(e) => setEditProjectBudget(parseFloat(e.target.value) || 0)}
+                        min="0"
+                        value={editProjectPrice}
+                        onChange={(e) => setEditProjectPrice(parseFloat(e.target.value) || 0)}
                         className={styles.formInput}
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>{isRTL ? 'المصروف' : 'Spent'}</label>
+                      <label>{isRTL ? 'المصروف (ر.س)' : 'Spent (SAR)'}</label>
                       <input
                         type="number"
+                        min="0"
                         value={editProjectSpent}
                         onChange={(e) => setEditProjectSpent(parseFloat(e.target.value) || 0)}
                         className={styles.formInput}
@@ -1107,13 +1168,13 @@ function ControllersContent() {
                       <label>{isRTL ? 'الحالة' : 'Status'}</label>
                       <select
                         value={editProjectStatus}
-                        onChange={(e) => setEditProjectStatus(e.target.value as Project['status'])}
+                        onChange={(e) => setEditProjectStatus(e.target.value as APIProject['status'])}
                         className={styles.formInput}
                       >
                         <option value="active">{isRTL ? 'نشط' : 'Active'}</option>
                         <option value="completed">{isRTL ? 'مكتمل' : 'Completed'}</option>
                         <option value="pending">{isRTL ? 'قيد الانتظار' : 'Pending'}</option>
-                        <option value="on-hold">{isRTL ? 'متوقف' : 'On Hold'}</option>
+                        <option value="onhold">{isRTL ? 'متوقف' : 'On Hold'}</option>
                       </select>
                     </div>
                     <div className={styles.formGroup}>
@@ -1129,7 +1190,7 @@ function ControllersContent() {
                       <label>{t.controllers.projects.priority}</label>
                       <select
                         value={editProjectPriority}
-                        onChange={(e) => setEditProjectPriority(e.target.value as Project['priority'])}
+                        onChange={(e) => setEditProjectPriority(e.target.value as APIProject['priority'])}
                         className={styles.formInput}
                       >
                         <option value="low">{isRTL ? 'منخفضة' : 'Low'}</option>
@@ -1138,95 +1199,171 @@ function ControllersContent() {
                         <option value="urgent">{isRTL ? 'عاجلة' : 'Urgent'}</option>
                       </select>
                     </div>
-                    <div className={styles.formGroup}>
-                      <label>{t.controllers.projects.team}</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={editProjectTeam}
-                        onChange={(e) => setEditProjectTeam(parseInt(e.target.value) || 1)}
-                        className={styles.formInput}
-                      />
-                    </div>
                   </div>
                   <div style={{ 
                     display: 'flex', 
                     gap: '10px', 
                     marginTop: '20px',
                     padding: '15px 0 0',
-                    borderTop: '1px solid var(--border-color)'
+                    borderTop: '1px solid rgba(255,255,255,0.05)'
                   }}>
-                    <button className={styles.primaryBtn} onClick={saveEditedProject}>
-                      <SaveIcon size={16} /> {isRTL ? 'حفظ التغييرات' : 'Save Changes'}
+                    <button
+                      className={styles.primaryBtn}
+                      onClick={saveEditedProject}
+                      disabled={projectActionLoading}
+                      style={{ opacity: projectActionLoading ? 0.5 : 1 }}
+                    >
+                      {projectActionLoading ? (isRTL ? 'جاري الحفظ...' : 'Saving...') : (<><SaveIcon size={16} /> {isRTL ? 'حفظ التغييرات' : 'Save Changes'}</>)}
                     </button>
                     <button className={styles.secondaryBtn} onClick={() => setEditingProject(null)}>
                       {isRTL ? 'إلغاء' : 'Cancel'}
                     </button>
                   </div>
-                  <p style={{ 
-                    marginTop: '12px', 
-                    fontSize: '0.8rem', 
-                    color: 'var(--text-dim)',
-                    opacity: 0.7
-                  }}>
-                    {isRTL 
-                      ? '* التغييرات ستظهر تلقائياً في لوحة تحكم العميل (Dashboard)' 
-                      : '* Changes will automatically appear in the client\'s Dashboard'}
-                  </p>
                 </div>
               </div>
             )}
 
-            <div className={styles.projectsGrid}>
-              {projects.map(project => (
-                <div key={project.id} className={styles.projectCard}>
-                  <div className={styles.projectCardHeader}>
-                    <h3>{project.name}</h3>
-                    <span 
-                      className={styles.badge}
-                      style={{ backgroundColor: getPriorityColor(project.priority) }}
+            {/* Delete Confirmation Modal */}
+            {confirmDeleteProject && (
+              <div className={styles.modalOverlay} onClick={() => setConfirmDeleteProject(null)}>
+                <div className={styles.modal} onClick={(e) => e.stopPropagation()} style={{ maxWidth: '450px', textAlign: 'center' }}>
+                  <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>⚠️</div>
+                  <h3 style={{ color: '#fff', marginBottom: '0.5rem' }}>
+                    {isRTL ? 'تأكيد الحذف' : 'Confirm Deletion'}
+                  </h3>
+                  <p style={{ color: '#94a3b8', marginBottom: '1.5rem' }}>
+                    {isRTL
+                      ? 'هل أنت متأكد من حذف هذا المشروع؟ لا يمكن التراجع عن هذا الإجراء.'
+                      : 'Are you sure you want to delete this project? This action cannot be undone.'}
+                  </p>
+                  <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                    <button className={styles.secondaryBtn} onClick={() => setConfirmDeleteProject(null)}>
+                      {isRTL ? 'إلغاء' : 'Cancel'}
+                    </button>
+                    <button
+                      className={styles.primaryBtn}
+                      onClick={() => handleDeleteProject(confirmDeleteProject)}
+                      disabled={projectActionLoading}
+                      style={{
+                        background: 'linear-gradient(135deg, #FF4444, #FF8C00)',
+                        opacity: projectActionLoading ? 0.5 : 1,
+                      }}
                     >
-                      {project.priority}
-                    </span>
-                  </div>
-                  
-                  <p className={styles.projectClient}><UserIcon size={16} /> {project.client}</p>
-                  <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '2px', opacity: 0.6 }}>{project.clientEmail}</p>
-                  
-                  <div className={styles.projectProgress}>
-                    <div className={styles.progressInfo}>
-                      <span>{t.controllers.projects.progress}</span>
-                      <span>{project.progress}%</span>
-                    </div>
-                    <div className={styles.progressBar}>
-                      <div 
-                        className={styles.progressFill}
-                        style={{ width: `${project.progress}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  <div className={styles.projectStats}>
-                    <div className={styles.projectStat}>
-                      <span>{t.controllers.projects.budget}</span>
-                      <strong>{formatCurrency(project.budget)}</strong>
-                    </div>
-                    <div className={styles.projectStat}>
-                      <span>{t.controllers.projects.deadline}</span>
-                      <strong>{formatDate(project.deadline)}</strong>
-                    </div>
-                  </div>
-
-                  <div className={styles.projectFooter}>
-                    <span className={styles.teamInfo}><UsersIcon size={16} /> {project.team} {isRTL ? 'أعضاء' : 'members'}</span>
-                    <div className={styles.actionButtons}>
-                      <button className={styles.iconBtn}><EyeIcon size={18} /></button>
-                      <button className={styles.iconBtn} onClick={() => openEditProject(project)}><EditIcon size={18} /></button>
-                    </div>
+                      {projectActionLoading ? (isRTL ? 'جاري الحذف...' : 'Deleting...') : (isRTL ? 'حذف المشروع' : 'Delete Project')}
+                    </button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            )}
+
+            {/* Loading State */}
+            {projectsLoading && (
+              <div style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+                <div style={{
+                  width: '40px', height: '40px', border: '3px solid rgba(112, 66, 248, 0.2)',
+                  borderTopColor: '#7042f8', borderRadius: '50%', margin: '0 auto 1rem',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+                <p>{isRTL ? 'جاري التحميل...' : 'Loading...'}</p>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!projectsLoading && projects.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '4rem', color: '#94a3b8' }}>
+                <div style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.4 }}>📁</div>
+                <h3 style={{ color: '#fff', marginBottom: '0.5rem' }}>
+                  {isRTL ? 'لا توجد مشاريع' : 'No Projects Found'}
+                </h3>
+                <p>{isRTL ? 'أنشئ مشروعك الأول للبدء' : 'Create your first project to get started'}</p>
+                <button
+                  className={styles.primaryBtn}
+                  style={{ marginTop: '1.5rem' }}
+                  onClick={() => setShowAddProjectForm(true)}
+                >
+                  {isRTL ? 'إنشاء مشروع' : 'Create Project'}
+                </button>
+              </div>
+            )}
+
+            {/* Project Cards Grid */}
+            {!projectsLoading && projects.length > 0 && (
+              <div className={styles.projectsGrid}>
+                {projects.map(project => {
+                  const overallProgress = computeOverallProgress(project)
+                  const statusLabels: Record<string, { ar: string; en: string }> = {
+                    active: { ar: 'نشط', en: 'Active' },
+                    pending: { ar: 'معلق', en: 'Pending' },
+                    completed: { ar: 'مكتمل', en: 'Completed' },
+                    onhold: { ar: 'متوقف', en: 'On Hold' },
+                  }
+                  return (
+                    <div key={project.id} className={styles.projectCard}>
+                      <div className={styles.projectCardHeader}>
+                        <h3>{project.name}</h3>
+                        <span 
+                          className={styles.badge}
+                          style={{ backgroundColor: getStatusColor(project.status) }}
+                        >
+                          {isRTL ? statusLabels[project.status]?.ar : statusLabels[project.status]?.en}
+                        </span>
+                      </div>
+                      
+                      <p className={styles.projectClient}>
+                        <span 
+                          className={styles.badge}
+                          style={{ backgroundColor: getPriorityColor(project.priority), fontSize: '0.7rem' }}
+                        >
+                          {project.priority}
+                        </span>
+                        <span style={{ marginInlineStart: '8px', color: '#94a3b8', fontSize: '0.85rem' }}>
+                          {formatDate(project.deadline)}
+                        </span>
+                      </p>
+                      
+                      <div className={styles.projectProgress}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                          <span style={{ color: '#94a3b8', fontSize: '0.85rem' }}>
+                            {isRTL ? 'التقدم' : 'Progress'}
+                          </span>
+                          <span style={{ color: '#fff', fontSize: '0.85rem', fontWeight: 600 }}>
+                            {overallProgress}%
+                          </span>
+                        </div>
+                        <div className={styles.progressBar}>
+                          <div 
+                            className={styles.progressFill}
+                            style={{ width: `${overallProgress}%` }}
+                          />
+                        </div>
+                      </div>
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
+                        <span>{isRTL ? 'الميزانية' : 'Budget'}: <span style={{ color: '#00C781' }}>{formatCurrency(project.price)}</span></span>
+                        <span>{isRTL ? 'المصروف' : 'Spent'}: <span style={{ color: '#FF8C00' }}>{formatCurrency(project.spent)}</span></span>
+                      </div>
+
+                      <div className={styles.projectFooter}>
+                        <span className={styles.teamInfo}><UsersIcon size={16} /> {project.team.length} {isRTL ? 'أعضاء' : 'members'}</span>
+                        <div className={styles.actionButtons}>
+                          <button className={styles.iconBtn} title={isRTL ? 'عرض' : 'View'}><EyeIcon size={18} /></button>
+                          <button className={styles.iconBtn} onClick={() => openEditProject(project)} title={isRTL ? 'تعديل' : 'Edit'}><EditIcon size={18} /></button>
+                          <button 
+                            className={styles.iconBtn} 
+                            onClick={() => setConfirmDeleteProject(project.id)} 
+                            title={isRTL ? 'حذف' : 'Delete'}
+                            style={{ color: '#ff6b6b' }}
+                          >
+                            <TrashIcon size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         )}
 

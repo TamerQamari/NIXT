@@ -1,0 +1,33 @@
+user : ready
+admin : ready
+
+projects
+ {
+    id(UUID)
+    name
+    user_id
+    progress:
+    [{
+        id,
+        title,
+        percent,
+    }, ...]
+    progress_completed
+    [
+        ids
+    ]
+    price
+    spent
+    priority(low,medium,high,urgent)
+    status(active,pending,completed,onhold)
+    deadline
+    team[admin_id]
+}
+
+Activity_log
+{
+    id(UUID)
+    user_id
+    duration
+    page
+}
