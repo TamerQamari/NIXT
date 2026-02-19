@@ -3,7 +3,9 @@ import { Poppins, Cairo } from "next/font/google";
 import Script from "next/script";
 import { TawkChatButton } from "@/components/UI";
 import { LanguageProvider } from "@/hooks/useLanguage";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider as DashboardAuthProvider } from "@/hooks/useAuth";
+import { AuthProvider } from "@/lib/auth-context";
+import { GoogleAuthProvider } from "@/lib/google-auth-provider";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -48,14 +50,18 @@ export default function RootLayout({
         <link rel="preload" href="/IMS.png" as="image" />
       </head>
       <body className={`${poppins.variable} ${cairo.variable}`}>
-        <LanguageProvider>
+        <GoogleAuthProvider>
           <AuthProvider>
-            {children}
-            
-            {/* زر الدردشة المباشرة */}
-            <TawkChatButton />
+            <LanguageProvider>
+              <DashboardAuthProvider>
+                {children}
+                
+                {/* زر الدردشة المباشرة */}
+                <TawkChatButton />
+              </DashboardAuthProvider>
+            </LanguageProvider>
           </AuthProvider>
-        </LanguageProvider>
+        </GoogleAuthProvider>
         
         {/* Tawk.to Live Chat */}
         <Script
@@ -64,6 +70,16 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+              
+              // تصفية أخطاء tawk.to الوهمية
+              (function(){
+                var origError = console.error;
+                console.error = function() {
+                  if (arguments.length === 1 && arguments[0] === true) return;
+                  origError.apply(console, arguments);
+                };
+              })();
+              
               (function(){
                 var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
                 s1.async=true;
